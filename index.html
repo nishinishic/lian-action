@@ -42,19 +42,13 @@
         padding: 6px 0;
       }
 
-      .pad {
-        position: sticky;
-        top: 70px;
-        z-index: 999;
-      }
-
-      iframe {
-        width: 80vw;
-        height: 300px;
-        margin-right: calc(-50px);
-        margin-bottom: 60px;
-
-      }
+.pad iframe{
+  display:block; width:100vw; height:70vh; border:0;
+  margin-left:calc(-50px); margin-right:calc(-50px); margin-bottom:60px;
+}
+.fallback{ margin:16px 0 60px; margin-left:calc(-50px); margin-right:calc(-50px); padding:16px; background:#0b62ff12; }
+.pad-btn{ display:inline-block; padding:12px 16px; background:#0b62ff; color:#fff; text-decoration:none; border-radius:10px; font-weight:600; }
+.hide{ display:none; }
 
       h3 {
         margin-bottom: 40px;
@@ -66,9 +60,15 @@
 
   <body>
     <a href="https://lianass.nohost.me/pad/p/scanlianas" target="_blank"><h2>随时在此留言提问回应</h2></a>
-    <div class="pad">
-      <iframe id="padFrame" class="hide" src="https://lianass.nohost.me/pad/p/scanlianas" loading="lazy"></iframe>
-    </div>
+
+<div class="pad">
+  <iframe id="padFrame" class="hide" src="https://lianass.nohost.me/pad/p/scanlianas" loading="lazy"></iframe>
+  <div id="padFallback" class="fallback hide">
+    <p style="margin:0 0 12px">在手机上打开以编辑：</p>
+    <a class="pad-btn" href="https://lianass.nohost.me/pad/p/scanlianas" target="_blank" rel="noopener">打开留言板</a>
+  </div>
+</div>
+
     <h3>「今天你扫码了吗？」 @Automatism Studio <br> 25.10.25.</h3>
     <div>
       <details>
@@ -186,33 +186,25 @@
       </details>
     </div> 
 
-    <script>
-    (function () {
-      // crude but reliable iOS touch Safari detection
-      const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent)
-        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+<script>
+(function () {
+  const ua = navigator.userAgent;
+  const isIOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
 
-      const iframe = document.getElementById('padFrame');
-      const fallback = document.getElementById('padFallback');
+  const iframe = document.getElementById('padFrame');
+  const fallback = document.getElementById('padFallback');
 
-      if (isIOS) {
-        // iOS Safari: prefer external open (storage blocked in cross-site iframes)
-        fallback.classList.remove('hide');
-      } else {
-        // Non-iOS: show iframe
-        iframe.classList.remove('hide');
-      }
-
-      // Safety net: if the iframe fails to become interactive, leave the fallback
-      // visible after a short grace period.
-      // (We can’t read cross-origin errors, so this is a best-effort UX guard.)
-      setTimeout(() => {
-        if (!iframe || iframe.classList.contains('hide')) return;
-        // If desired, also show the fallback link for convenience
-        fallback.classList.remove('hide');
-      }, 2500);
-    })();
-    </script>
+  // Prefer fallback on mobile to avoid 3P-cookie/storage blocks
+  if (isMobile) {
+    fallback.classList.remove('hide');
+  } else {
+    iframe.classList.remove('hide');
+    // also show a convenience link in case the embed fails silently later
+    setTimeout(() => fallback.classList.remove('hide'), 2500);
+  }
+})();
+</script>
 
   </body>
 </html>
